@@ -4,7 +4,8 @@
   "description": "Localise strings in your application out of a JSON object with translations",
   "main": "index.js",
   "scripts": {
-    "test": "npm test"
+    "test": "./node_modules/.bin/jasmine-node test",
+    "build": "./node_modules/.bin/babel src/localiser.js > ./dist/localiser.js"
   },
   "repository": {
     "type": "git",
@@ -20,5 +21,10 @@
   "bugs": {
     "url": "https://github.com/jwulf/localiser/issues"
   },
-  "homepage": "https://github.com/jwulf/localiser#readme"
+  "homepage": "https://github.com/jwulf/localiser#readme",
+  "devDependencies": {
+    "babel-cli": "^6.18.0",
+    "babel-preset-es2015": "^6.18.0",
+    "jasmine-node": "^1.14.5"
+  }
 }
