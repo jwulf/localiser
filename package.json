@@ -1,0 +1,24 @@
+{
+  "name": "localiser",
+  "version": "1.0.0",
+  "description": "Localise strings in your application out of a JSON object with translations",
+  "main": "index.js",
+  "scripts": {
+    "test": "npm test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jwulf/localiser.git"
+  },
+  "keywords": [
+    "localisation",
+    "localization",
+    "l10n"
+  ],
+  "author": "Josh Wulf",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jwulf/localiser/issues"
+  },
+  "homepage": "https://github.com/jwulf/localiser#readme"
+}
