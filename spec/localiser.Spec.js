@@ -118,7 +118,7 @@ describe("Localiser", () =>{
         });
     });
 
-    describe("Localiser with two locales and a non-en_US default", () => {
+    describe("Localiser with two locales and Danish by default", () => {
         const DA_localiser = new Localiser();
         DA_localiser.loadLocale(strings_en_US);
         DA_localiser.loadLocale(strings_da);
