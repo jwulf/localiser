@@ -8,7 +8,8 @@
 const DEFAULT_STRING_ID = "_default";
 const DEFAULT_NO_STRING_ID = "404";
 const DEFAULT_LOCALE = "en_US";
-const DEFAULT_BORKED = "Error: String not found";
+const DEFAULT_FALLBACK_LOCALE = "en_US";
+const DEFAULT_BORKED = "Error: String not found for ID: ";
 
 class Localiser {
 
@@ -17,8 +18,10 @@ class Localiser {
         this.defaultStringId = config.defaultStringId || DEFAULT_STRING_ID;
         this.noStringId = config.noStringId || DEFAULT_NO_STRING_ID;
         this.defaultLocale = config.defaultLocale || DEFAULT_LOCALE;
+        this.fallbackLocale = config.fallbackLocale || DEFAULT_FALLBACK_LOCALE;
         this.b0rked = config.b0rked || DEFAULT_BORKED;
         this.strings = {};
+        this.locales = [];
         if (strings) this.loadLocale(strings);
     }
 
@@ -31,11 +34,28 @@ class Localiser {
      * If one does not, returns the b0rked error object.
      */
     getLocalisedString(stringId, locale, n){
+        // recursion depth-detection for the case where there is no 404 string at all.
         if (!n) n = 0;
-        if (n === 2) return this.b0rked; // recursion depth-detection for the case where there is no 404 storypoint at all.
-        if (this.strings[stringId] && this.strings[stringId][locale]) return this.strings[stringId][locale]; // return a localised storypoint if there is one
-        if (this.strings[stringId] && this.strings[stringId][this.defaultLocale]) return this.strings[stringId][this.defaultLocale]; // return the default locale storypoint if there is one
-        return this.getLocalisedString(this.noStringId, locale, n + 1); // recurse for a localised 404 storypoint
+        // Return an error message if no string exists for this id in requested, default, or fallback locales
+        if (n === 2) {
+            if (this.b0rked === DEFAULT_BORKED) return this.b0rked + stringId; 
+            else return this.b0rked;
+        }
+
+        // return a localised string if there is one
+        if (this.strings[stringId] && this.strings[stringId][locale]) 
+            return this.strings[stringId][locale]; 
+        
+        // return the default locale string if there is one
+        if (locale != this.defaultLocale && this.strings[stringId] && this.strings[stringId][this.defaultLocale]) 
+            return this.strings[stringId][this.defaultLocale]; 
+
+        // return the fallback locale string if there is one    
+        if (locale != this.fallbackLocale && this.strings[stringId] && this.strings[stringId][this.fallbackLocale]) 
+            return this.strings[stringId][this.fallbackLocale]; 
+
+        // recurse for a localised 404 error message
+        return this.getLocalisedString(this.noStringId, locale, n + 1); 
     }
 
     localise(stringId, locale){
@@ -48,6 +68,15 @@ class Localiser {
         // otherwise, return a localised version of the requested storypoint
             return this.getLocalisedString(stringId, requestedLocale);
         }
+    }
+
+    listLocales() {
+        return this.locales;
+    }
+
+    setDefaultLocale(locale){
+        // There is no check if this locale is loaded
+        this.defaultLocale = locale;
     }
 
     loadLocale(strings){
@@ -64,6 +93,7 @@ class Localiser {
             this.strings[n][locale] = strings[n];
         
         }
+        if (-1 === this.locales.indexOf(locale)) this.locales.push(locale);
     }
 }
 

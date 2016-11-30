@@ -1,6 +1,6 @@
 {
   "name": "localiser",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Localise strings in your application out of a JSON object with translations",
   "main": "index.js",
   "scripts": {

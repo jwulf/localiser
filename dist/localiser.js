@@ -12,7 +12,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 var DEFAULT_STRING_ID = "_default";
 var DEFAULT_NO_STRING_ID = "404";
 var DEFAULT_LOCALE = "en_US";
-var DEFAULT_BORKED = "Error: String not found";
+var DEFAULT_FALLBACK_LOCALE = "en_US";
+var DEFAULT_BORKED = "Error: String not found for ID: ";
 
 var Localiser = function () {
     function Localiser(strings, config) {
@@ -22,8 +23,10 @@ var Localiser = function () {
         this.defaultStringId = config.defaultStringId || DEFAULT_STRING_ID;
         this.noStringId = config.noStringId || DEFAULT_NO_STRING_ID;
         this.defaultLocale = config.defaultLocale || DEFAULT_LOCALE;
+        this.fallbackLocale = config.fallbackLocale || DEFAULT_FALLBACK_LOCALE;
         this.b0rked = config.b0rked || DEFAULT_BORKED;
         this.strings = {};
+        this.locales = [];
         if (strings) this.loadLocale(strings);
     }
 
@@ -40,11 +43,24 @@ var Localiser = function () {
     _createClass(Localiser, [{
         key: "getLocalisedString",
         value: function getLocalisedString(stringId, locale, n) {
+            // recursion depth-detection for the case where there is no 404 string at all.
             if (!n) n = 0;
-            if (n === 2) return this.b0rked; // recursion depth-detection for the case where there is no 404 storypoint at all.
-            if (this.strings[stringId] && this.strings[stringId][locale]) return this.strings[stringId][locale]; // return a localised storypoint if there is one
-            if (this.strings[stringId] && this.strings[stringId][this.defaultLocale]) return this.strings[stringId][this.defaultLocale]; // return the default locale storypoint if there is one
-            return this.getLocalisedString(this.noStringId, locale, n + 1); // recurse for a localised 404 storypoint
+            // Return an error message if no string exists for this id in requested, default, or fallback locales
+            if (n === 2) {
+                if (this.b0rked === DEFAULT_BORKED) return this.b0rked + stringId;else return this.b0rked;
+            }
+
+            // return a localised string if there is one
+            if (this.strings[stringId] && this.strings[stringId][locale]) return this.strings[stringId][locale];
+
+            // return the default locale string if there is one
+            if (locale != this.defaultLocale && this.strings[stringId] && this.strings[stringId][this.defaultLocale]) return this.strings[stringId][this.defaultLocale];
+
+            // return the fallback locale string if there is one    
+            if (locale != this.fallbackLocale && this.strings[stringId] && this.strings[stringId][this.fallbackLocale]) return this.strings[stringId][this.fallbackLocale];
+
+            // recurse for a localised 404 error message
+            return this.getLocalisedString(this.noStringId, locale, n + 1);
         }
     }, {
         key: "localise",
@@ -58,6 +74,17 @@ var Localiser = function () {
                 // otherwise, return a localised version of the requested storypoint
                 return this.getLocalisedString(stringId, requestedLocale);
             }
+        }
+    }, {
+        key: "listLocales",
+        value: function listLocales() {
+            return this.locales;
+        }
+    }, {
+        key: "setDefaultLocale",
+        value: function setDefaultLocale(locale) {
+            // There is no check if this locale is loaded
+            this.defaultLocale = locale;
         }
     }, {
         key: "loadLocale",
@@ -74,6 +101,7 @@ var Localiser = function () {
                 if (!this.strings[n]) this.strings[n] = {};
                 this.strings[n][locale] = strings[n];
             }
+            if (-1 === this.locales.indexOf(locale)) this.locales.push(locale);
         }
     }]);
 
