@@ -13,6 +13,7 @@ module.exports = function (wallaby) {
     ],
 
     compilers: {
+      '**/*.js': wallaby.compilers.babel()
     },
 
     testFramework: "jasmine",
